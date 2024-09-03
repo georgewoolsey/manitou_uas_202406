@@ -779,11 +779,10 @@ plt_fnl_temp =
     harrypotter::scale_fill_hp_d("always", name = "clump size", drop = F) +
     # tree points
     geom_sf(data = ttops_temp, color = "gray88", shape = ".") +
-    theme_void()
+    theme_void() +
+    theme(plot.subtitle = element_text(size = 10, hjust = 0.5, face = "bold"), legend.title=element_text(size=8), legend.text=element_text(size = 7))
 # plot
 plt_fnl_temp
-# save it
-
 ```
 
 highlight the openings
@@ -809,16 +808,17 @@ plt_open_temp =
       ) +
       # tree points
       geom_sf(data = ttops_temp, color = "gray88", shape = ".") +
-      theme_void()
+      theme_void() +
+      theme(plot.subtitle = element_text(size = 10, hjust = 0.5, face = "bold"), legend.title=element_text(size=8), legend.text=element_text(size = 7))
+# plot
 plt_open_temp
-# save it
-
 ```
 
 combine them?
 
 ```{r}
-plt_fnl_temp + (plt_open_temp + theme(legend.position = "none"))
+plt_fnl_temp + (plt_open_temp + theme(legend.position = "none")) &
+  theme(plot.subtitle = element_text(size = 10, hjust = 0.5, face = "bold"), legend.title=element_text(size=8), legend.text=element_text(size = 7))
 ```
 
 ### Clump Metrics{#clump_metrics}
@@ -2386,7 +2386,8 @@ plt_fnl_temp2 =
     harrypotter::scale_fill_hp_d("always", name = "clump size", drop = F) + 
     # tree points
     geom_sf(data = ttops_temp2, color = "gray88", shape = ".") +
-    theme_void()
+    theme_void() +
+    theme(plot.subtitle = element_text(size = 10, hjust = 0.5, face = "bold"), legend.title=element_text(size=8), legend.text=element_text(size = 7))
 # plot
 plt_fnl_temp2
 ```
@@ -2414,30 +2415,34 @@ plt_open_temp2 =
       ) +
       # tree points
       geom_sf(data = ttops_temp2, color = "gray88", shape = ".") +
-      theme_void()
+      theme_void() +
+      theme(plot.subtitle = element_text(size = 10, hjust = 0.5, face = "bold"), legend.title=element_text(size=8), legend.text=element_text(size = 7))
 plt_open_temp2
 # save it
 
 ```
 
-combine them?
+combine plots with prescription
 
 ```{r}
-plt_fnl_temp2 + (plt_open_temp2 + theme(legend.position = "none"))
+plt_fnl_temp2 + (plt_open_temp2 + theme(legend.position = "none")) &
+  theme(plot.subtitle = element_text(size = 10, hjust = 0.5, face = "bold"), legend.title=element_text(size=8), legend.text=element_text(size = 7))
 ```
 
 combine old vs new
 
 ```{r}
 (plt_fnl_temp + labs(subtitle = "Pre-Treatment")) +
-  (plt_fnl_temp2  + labs(subtitle = "Post-Treatment") + theme(legend.position = "none"))
+  (plt_fnl_temp2  + labs(subtitle = "Post-Treatment") + theme(legend.position = "none")) &
+  theme(plot.subtitle = element_text(size = 10, hjust = 0.5, face = "bold"), legend.title=element_text(size=8), legend.text=element_text(size = 7))
 ```
 
 combine old vs new openings highlight
 
 ```{r}
 (plt_open_temp + labs(subtitle = "Pre-Treatment")) +
-  (plt_open_temp2  + labs(subtitle = "Post-Treatment") + theme(legend.position = "none"))
+  (plt_open_temp2  + labs(subtitle = "Post-Treatment") + theme(legend.position = "none")) &
+  theme(plot.subtitle = element_text(size = 10, hjust = 0.5, face = "bold"), legend.title=element_text(size=8), legend.text=element_text(size = 7))
 ```
 
 individual tree crowns pre- and post-treatment
@@ -2471,7 +2476,8 @@ plt_crowns2 <-
 (plt_crowns1 + labs(subtitle = "Pre-Treatment") + 
     theme(legend.position = "right", legend.direction = "vertical")
   ) +
-  (plt_crowns2  + labs(subtitle = "Post-Treatment") + theme(legend.position = "none"))
+  (plt_crowns2  + labs(subtitle = "Post-Treatment") + theme(legend.position = "none")) &
+  theme(plot.subtitle = element_text(size = 10, hjust = 0.5, face = "bold"), legend.title=element_text(size=8), legend.text=element_text(size = 7))
 
 ```
 

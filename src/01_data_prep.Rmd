@@ -228,3 +228,83 @@ Orthomosaic `tif` files from the UAS flight imagery that were created in [Agisof
 remove(list = ls()[grep("_temp",ls())])
 gc()
 ```
+
+## What is this Point Cloud?
+
+```{r,echo=FALSE,message=FALSE,warning=FALSE}
+# set up for printing rgl graphics
+r3dDefaults = rgl::r3dDefaults
+m = structure(c(0.921, -0.146, 0.362, 0, 0.386, 0.482, -0.787, 0, 
+                -0.06, 0.864, 0.5, 0, 0, 0, 0, 1), .Dim = c(4L, 4L))
+r3dDefaults$FOV = 50
+r3dDefaults$userMatrix = m
+r3dDefaults$zoom = 0.75
+rgl::setupKnitr(autoprint = TRUE)
+```
+
+Let's check out the raw point cloud real quick. First, we'll load the raw las file generated via the Agisoft Metashape SfM algorithm. Notice the `filter` argument in the `lidR::readLAS` call to decimate the point cloud which we then keep only a region of interest using `lidR::clip_roi`
+
+```{r}
+las_temp = list.files(delivery_dir, pattern = "*\\.(las|laz)$", full.names = T)[1] %>% 
+  lidR::readLAS(filter = "-keep_random_fraction 0.2") %>% 
+  lidR::clip_roi(
+    las_ctg_dta %>% sf::st_centroid() %>% sf::st_buffer(50) %>% sf::st_bbox() %>% sf::st_as_sfc()
+  )
+```
+
+what is this data?
+
+```{r}
+# what is this data?
+las_temp@data %>% dplyr::glimpse()
+```
+
+The `lidR::plot` function allows for plotting powered by the [`rgl`](https://cran.r-project.org/package=rgl) package to provide a versatile and interactive 3D viewer of points. The argument `breaks` enables to defined more adequate breaks in the color palette for example when intensity contains large outliers.
+
+Here we will also plot with the DTM that we generated via the UAS point cloud [processing script](https://github.com/georgewoolsey/point_cloud_tree_detection_ex/blob/da5c8a13e9b2f2914b306201605e907643b3006d/src/point_cloud_processing.R) using `lidR::add_dtm3d` 
+
+```{r, rgl = TRUE}
+p_temp = lidR::plot(las_temp, color = "Z", breaks = "quantile", bg = "white", legend = T)
+# add dtm to plot
+lidR::add_dtm3d(
+  x = p_temp
+  , dtm = dtm_rast %>% 
+    terra::crop(
+      las_ctg_dta %>% sf::st_centroid() %>% sf::st_buffer(80) %>% sf::st_bbox() %>% sf::st_as_sfc() %>%
+        terra::vect() %>%
+        terra::project(terra::crs(dtm_rast))
+    ) %>%
+    terra::mask(
+      las_ctg_dta %>% sf::st_centroid() %>% sf::st_buffer(80) %>% sf::st_bbox() %>% sf::st_as_sfc() %>%
+        terra::vect() %>%
+        terra::project(terra::crs(dtm_rast))
+    ) %>%
+    terra::focal(
+      w = 3
+      , fun = "mean"
+      , na.rm = T
+      , na.policy = "only"
+    )
+)
+```
+
+Notice how the point altitudes are in meters above sea level. We can quickly normalize the point cloud using the DTM.
+
+```{r, rgl = TRUE}
+nlas_temp = las_temp - dtm_rast
+# plot it
+lidR::plot(nlas_temp, color = "Z", breaks = "quantile", bg = "white", legend = T)
+```
+
+let's get rid of all the ground points to focus on possible vegetation points
+
+```{r, rgl = TRUE}
+nlas_temp %>% 
+  lidR::filter_poi(Z>=0.01) %>% 
+  lidR::plot(color = "Z", breaks = "quantile", bg = "white", legend = T)
+```
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE, include=FALSE}
+remove(list = ls()[grep("_temp",ls())])
+gc()
+```

@@ -187,7 +187,7 @@ plt_ttops_temp = ortho_plt_fn(100) +
     geom_sf(
       data = treetops_sf_with_dbh %>% sf::st_intersection(stand_sf)
       , mapping = aes(color = tree_height_ft)
-      , size = 1
+      , size = 1.5
     ) +
     harrypotter::scale_color_hp("gryffindor") +
     labs(color = "Individual Tree\nHt. (ft)")
@@ -218,7 +218,7 @@ plt_ttops_temp = ortho_plt_fn(100) +
           , ostory_sz = ifelse(ostory=="overstory",0.51,0.5)
         )
       , mapping = aes(color = ostory)
-      , size = 1
+      , size = 1.5
     ) +
     harrypotter::scale_color_hp_d("gryffindor", direction = -1) +
     labs(color = "") +
@@ -295,12 +295,13 @@ ttops_temp = ttops_temp %>%
     , clump_n_trees = dplyr::n()
     , clump_n_trees_grp = cut(
         clump_n_trees
-        ,breaks = c(0,1,4,9,15,Inf)
-        , labels = c("Individual","2-4 trees","5-9 trees","10-15 trees",">15 trees")
+        , breaks = c(0,1,4,9,15,25,Inf) # where to break the clump size groups
+        , labels = c("Individual","2-4 trees","5-9 trees","10-15 trees","16-25 trees",">25 trees") # what to name the clump size groups
+        
       ) %>% 
       factor(
         ordered = T
-        , levels = c("Individual","2-4 trees","5-9 trees","10-15 trees",">15 trees")
+          , levels = c("Individual","2-4 trees","5-9 trees","10-15 trees","16-25 trees",">25 trees") # what to name the clump size groups
       )
   ) %>% 
   dplyr::ungroup()
@@ -340,7 +341,7 @@ plt_grps_temp = ortho_plt_fn(100) +
     geom_sf(
       data = ttops_temp
       , mapping = aes(color = dbscan_cluster)
-      , size = 1
+      , size = 1.5
     ) +
     scale_color_manual(values = c(
       "white"
@@ -374,9 +375,9 @@ plt_grps_temp = ortho_plt_fn(100) +
     geom_sf(
       data = ttops_temp
       , mapping = aes(color = clump_n_trees_grp)
-      , size = 1
+      , size = 1.5
     ) +
-    harrypotter::scale_color_hp_d("newtscamander") +
+    harrypotter::scale_fill_hp_d("always", name = "clump size", drop = F) +
     labs(color = "") +
     theme(legend.key = element_rect(color = NA, fill = NA), legend.margin = margin(6.5,0,6.5,0)) +
     guides(size = "none", color = guide_legend(override.aes = list(size = 5)))
@@ -419,7 +420,7 @@ ortho_plt_fn(100) +
     geom_sf(
       data = ttops_temp
       , mapping = aes(color = distance_clump_nn_m)
-      , size = 1
+      , size = 1.5
     ) +
     # scale_color_viridis_c(option="viridis", na.value = "white") + 
     harrypotter::scale_color_hp("hufflepuff", na.value = "white") + 
@@ -659,6 +660,7 @@ ortho_plt_fn(100) +
     data = clump_polys_temp
     , mapping = aes(fill = dbscan_cluster)
     , color = NA, alpha = 0.9
+    , size = 1.5
   ) +
   scale_fill_manual(values = c(
     "white"
@@ -688,7 +690,7 @@ ortho_plt_fn(100) +
     geom_sf(
       data = clump_polys_temp
       , mapping = aes(fill = distance_nearest_clump_m)
-      , size = 1, color = NA
+      , size = 1.5, color = NA
     ) +
     harrypotter::scale_fill_hp("mischief", direction = -1) + 
     labs(fill = "nearest clump\ndist. (m)")

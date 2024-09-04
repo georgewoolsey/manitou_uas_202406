@@ -377,7 +377,7 @@ plt_grps_temp = ortho_plt_fn(100) +
       , mapping = aes(color = clump_n_trees_grp)
       , size = 1.5
     ) +
-    harrypotter::scale_fill_hp_d("always", name = "clump size", drop = F) +
+    harrypotter::scale_color_hp_d("always", name = "clump size", drop = F) +
     labs(color = "") +
     theme(legend.key = element_rect(color = NA, fill = NA), legend.margin = margin(6.5,0,6.5,0)) +
     guides(size = "none", color = guide_legend(override.aes = list(size = 5)))

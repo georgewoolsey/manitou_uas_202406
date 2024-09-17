@@ -377,12 +377,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>what is this data?</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="data_prep.html#cb6-1" tabindex="-1"></a><span class="co"># what is this data?</span></span>
 <span id="cb6-2"><a href="data_prep.html#cb6-2" tabindex="-1"></a>las_temp<span class="sc">@</span>data <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">glimpse</span>()</span></code></pre></div>
-<pre><code>## Rows: 2,048,023
+<pre><code>## Rows: 2,047,133
 ## Columns: 18
-## $ X                 &lt;dbl&gt; 490101.2, 490101.1, 490101.1, 490101.1, 490100.8, 49…
-## $ Y                 &lt;dbl&gt; 4330819, 4330819, 4330819, 4330819, 4330819, 4330820…
-## $ Z                 &lt;dbl&gt; 2361.639, 2360.961, 2361.542, 2361.542, 2360.817, 23…
-## $ Intensity         &lt;int&gt; 14392, 22873, 28270, 28784, 20560, 24415, 31354, 267…
+## $ X                 &lt;dbl&gt; 490100.8, 490100.8, 490101.2, 490101.2, 490101.1, 49…
+## $ Y                 &lt;dbl&gt; 4330819, 4330819, 4330820, 4330818, 4330818, 4330818…
+## $ Z                 &lt;dbl&gt; 2360.817, 2360.875, 2360.744, 2361.095, 2360.899, 23…
+## $ Intensity         &lt;int&gt; 20560, 38036, 24415, 36494, 31354, 35466, 28013, 179…
 ## $ ReturnNumber      &lt;int&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1…
 ## $ NumberOfReturns   &lt;int&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1…
 ## $ ScanDirectionFlag &lt;int&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1…
@@ -394,44 +394,85 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## $ ScanAngleRank     &lt;int&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…
 ## $ UserData          &lt;int&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…
 ## $ PointSourceID     &lt;int&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1…
-## $ R                 &lt;int&gt; 14135, 24158, 33410, 33924, 21588, 24929, 33410, 282…
-## $ G                 &lt;int&gt; 14649, 22873, 26985, 27499, 20560, 24672, 30840, 264…
-## $ B                 &lt;int&gt; 15420, 21074, 23130, 23644, 18761, 21845, 28784, 254…</code></pre>
-<p>The <code>lidR::plot</code> function allows for plotting powered by the <a href="https://cran.r-project.org/package=rgl"><code>rgl</code></a> package to provide a versatile and interactive 3D viewer of points. The argument <code>breaks</code> enables to defined more adequate breaks in the color palette for example when intensity contains large outliers.</p>
-<p>Here we will also plot with the DTM that we generated via the UAS point cloud <a href="https://github.com/georgewoolsey/point_cloud_tree_detection_ex/blob/da5c8a13e9b2f2914b306201605e907643b3006d/src/point_cloud_processing.R">processing script</a> using <code>lidR::add_dtm3d</code></p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="data_prep.html#cb8-1" tabindex="-1"></a>p_temp <span class="ot">=</span> lidR<span class="sc">::</span><span class="fu">plot</span>(las_temp, <span class="at">color =</span> <span class="st">&quot;Z&quot;</span>, <span class="at">breaks =</span> <span class="st">&quot;quantile&quot;</span>, <span class="at">bg =</span> <span class="st">&quot;white&quot;</span>, <span class="at">legend =</span> T)</span>
-<span id="cb8-2"><a href="data_prep.html#cb8-2" tabindex="-1"></a><span class="co"># add dtm to plot</span></span>
-<span id="cb8-3"><a href="data_prep.html#cb8-3" tabindex="-1"></a>lidR<span class="sc">::</span><span class="fu">add_dtm3d</span>(</span>
-<span id="cb8-4"><a href="data_prep.html#cb8-4" tabindex="-1"></a>  <span class="at">x =</span> p_temp</span>
-<span id="cb8-5"><a href="data_prep.html#cb8-5" tabindex="-1"></a>  , <span class="at">dtm =</span> dtm_rast <span class="sc">%&gt;%</span> </span>
-<span id="cb8-6"><a href="data_prep.html#cb8-6" tabindex="-1"></a>    terra<span class="sc">::</span><span class="fu">crop</span>(</span>
-<span id="cb8-7"><a href="data_prep.html#cb8-7" tabindex="-1"></a>      las_ctg_dta <span class="sc">%&gt;%</span> sf<span class="sc">::</span><span class="fu">st_centroid</span>() <span class="sc">%&gt;%</span> sf<span class="sc">::</span><span class="fu">st_buffer</span>(<span class="dv">80</span>) <span class="sc">%&gt;%</span> sf<span class="sc">::</span><span class="fu">st_bbox</span>() <span class="sc">%&gt;%</span> sf<span class="sc">::</span><span class="fu">st_as_sfc</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb8-8"><a href="data_prep.html#cb8-8" tabindex="-1"></a>        terra<span class="sc">::</span><span class="fu">vect</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb8-9"><a href="data_prep.html#cb8-9" tabindex="-1"></a>        terra<span class="sc">::</span><span class="fu">project</span>(terra<span class="sc">::</span><span class="fu">crs</span>(dtm_rast))</span>
-<span id="cb8-10"><a href="data_prep.html#cb8-10" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
-<span id="cb8-11"><a href="data_prep.html#cb8-11" tabindex="-1"></a>    terra<span class="sc">::</span><span class="fu">mask</span>(</span>
-<span id="cb8-12"><a href="data_prep.html#cb8-12" tabindex="-1"></a>      las_ctg_dta <span class="sc">%&gt;%</span> sf<span class="sc">::</span><span class="fu">st_centroid</span>() <span class="sc">%&gt;%</span> sf<span class="sc">::</span><span class="fu">st_buffer</span>(<span class="dv">80</span>) <span class="sc">%&gt;%</span> sf<span class="sc">::</span><span class="fu">st_bbox</span>() <span class="sc">%&gt;%</span> sf<span class="sc">::</span><span class="fu">st_as_sfc</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb8-13"><a href="data_prep.html#cb8-13" tabindex="-1"></a>        terra<span class="sc">::</span><span class="fu">vect</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb8-14"><a href="data_prep.html#cb8-14" tabindex="-1"></a>        terra<span class="sc">::</span><span class="fu">project</span>(terra<span class="sc">::</span><span class="fu">crs</span>(dtm_rast))</span>
-<span id="cb8-15"><a href="data_prep.html#cb8-15" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
-<span id="cb8-16"><a href="data_prep.html#cb8-16" tabindex="-1"></a>    terra<span class="sc">::</span><span class="fu">focal</span>(</span>
-<span id="cb8-17"><a href="data_prep.html#cb8-17" tabindex="-1"></a>      <span class="at">w =</span> <span class="dv">3</span></span>
-<span id="cb8-18"><a href="data_prep.html#cb8-18" tabindex="-1"></a>      , <span class="at">fun =</span> <span class="st">&quot;mean&quot;</span></span>
-<span id="cb8-19"><a href="data_prep.html#cb8-19" tabindex="-1"></a>      , <span class="at">na.rm =</span> T</span>
-<span id="cb8-20"><a href="data_prep.html#cb8-20" tabindex="-1"></a>      , <span class="at">na.policy =</span> <span class="st">&quot;only&quot;</span></span>
-<span id="cb8-21"><a href="data_prep.html#cb8-21" tabindex="-1"></a>    )</span>
-<span id="cb8-22"><a href="data_prep.html#cb8-22" tabindex="-1"></a>)</span></code></pre></div>
+## $ R                 &lt;int&gt; 21588, 38293, 24929, 34952, 31611, 35209, 30583, 190…
+## $ G                 &lt;int&gt; 20560, 39064, 24672, 38293, 31611, 36751, 27756, 179…
+## $ B                 &lt;int&gt; 18761, 33410, 21845, 31354, 29812, 31354, 24415, 161…</code></pre>
+<p>We can plot the point cloud with RGB if the spectral information was exported from the SfM software</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="data_prep.html#cb8-1" tabindex="-1"></a>lidR<span class="sc">::</span><span class="fu">plot</span>(las_temp, <span class="at">color =</span> <span class="st">&quot;RGB&quot;</span>, <span class="at">bg =</span> <span class="st">&quot;white&quot;</span>, <span class="at">legend =</span> F)</span></code></pre></div>
 <p><img src="manitou_uas_202406_files/figure-html/unnamed-chunk-8-1.png" width="1008" /></p>
-<p>Notice how the point altitudes are in meters above sea level. We can quickly normalize the point cloud using the DTM.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="data_prep.html#cb9-1" tabindex="-1"></a>nlas_temp <span class="ot">=</span> las_temp <span class="sc">-</span> dtm_rast</span>
-<span id="cb9-2"><a href="data_prep.html#cb9-2" tabindex="-1"></a><span class="co"># plot it</span></span>
-<span id="cb9-3"><a href="data_prep.html#cb9-3" tabindex="-1"></a>lidR<span class="sc">::</span><span class="fu">plot</span>(nlas_temp, <span class="at">color =</span> <span class="st">&quot;Z&quot;</span>, <span class="at">breaks =</span> <span class="st">&quot;quantile&quot;</span>, <span class="at">bg =</span> <span class="st">&quot;white&quot;</span>, <span class="at">legend =</span> T)</span></code></pre></div>
-<p><img src="manitou_uas_202406_files/figure-html/unnamed-chunk-9-1.png" width="1008" /></p>
-<p>let’s get rid of all the ground points to focus on possible vegetation points</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="data_prep.html#cb10-1" tabindex="-1"></a>nlas_temp <span class="sc">%&gt;%</span> </span>
-<span id="cb10-2"><a href="data_prep.html#cb10-2" tabindex="-1"></a>  lidR<span class="sc">::</span><span class="fu">filter_poi</span>(Z<span class="sc">&gt;=</span><span class="fl">0.01</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb10-3"><a href="data_prep.html#cb10-3" tabindex="-1"></a>  lidR<span class="sc">::</span><span class="fu">plot</span>(<span class="at">color =</span> <span class="st">&quot;Z&quot;</span>, <span class="at">breaks =</span> <span class="st">&quot;quantile&quot;</span>, <span class="at">bg =</span> <span class="st">&quot;white&quot;</span>, <span class="at">legend =</span> T)</span></code></pre></div>
+<p>make a gif</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="data_prep.html#cb9-1" tabindex="-1"></a><span class="fu">library</span>(magick)</span>
+<span id="cb9-2"><a href="data_prep.html#cb9-2" tabindex="-1"></a><span class="cf">if</span>(<span class="sc">!</span><span class="fu">file.exists</span>(<span class="st">&quot;../data/ptcld_rgb.gif&quot;</span>)){</span>
+<span id="cb9-3"><a href="data_prep.html#cb9-3" tabindex="-1"></a>  rgl<span class="sc">::</span><span class="fu">rgl.close</span>()</span>
+<span id="cb9-4"><a href="data_prep.html#cb9-4" tabindex="-1"></a>  lidR<span class="sc">::</span><span class="fu">plot</span>(las_temp, <span class="at">color =</span> <span class="st">&quot;RGB&quot;</span>, <span class="at">bg =</span> <span class="st">&quot;white&quot;</span>, <span class="at">legend =</span> F)</span>
+<span id="cb9-5"><a href="data_prep.html#cb9-5" tabindex="-1"></a>  rgl<span class="sc">::</span><span class="fu">movie3d</span>( rgl<span class="sc">::</span><span class="fu">spin3d</span>(), <span class="at">duration =</span> <span class="dv">8</span>, <span class="at">fps =</span> <span class="dv">10</span> , <span class="at">movie =</span> <span class="st">&quot;ptcld_rgb&quot;</span>, <span class="at">dir =</span> <span class="st">&quot;../data&quot;</span>)</span>
+<span id="cb9-6"><a href="data_prep.html#cb9-6" tabindex="-1"></a>  rgl<span class="sc">::</span><span class="fu">rgl.close</span>()</span>
+<span id="cb9-7"><a href="data_prep.html#cb9-7" tabindex="-1"></a>}</span></code></pre></div>
+<center>
+<img src="../data/ptcld_rgb.gif" />
+</center>
+<p>Things get fun when we view X and Y data in combination with Z data. The <code>lidR::plot</code> function allows for plotting powered by the <a href="https://cran.r-project.org/package=rgl"><code>rgl</code></a> package to provide a versatile and interactive 3D viewer of points. The argument <code>breaks</code> enables to defined more adequate breaks in the color palette for example when intensity contains large outliers.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="data_prep.html#cb10-1" tabindex="-1"></a>lidR<span class="sc">::</span><span class="fu">plot</span>(las_temp</span>
+<span id="cb10-2"><a href="data_prep.html#cb10-2" tabindex="-1"></a>           , <span class="at">color =</span> <span class="st">&quot;Z&quot;</span>, <span class="at">breaks =</span> <span class="st">&quot;quantile&quot;</span>, <span class="at">bg =</span> <span class="st">&quot;white&quot;</span>, <span class="at">legend =</span> T</span>
+<span id="cb10-3"><a href="data_prep.html#cb10-3" tabindex="-1"></a>           , <span class="at">pal =</span> harrypotter<span class="sc">::</span><span class="fu">hp</span>(<span class="at">n=</span><span class="dv">50</span>, <span class="at">house =</span> <span class="st">&quot;gryffindor&quot;</span>)</span>
+<span id="cb10-4"><a href="data_prep.html#cb10-4" tabindex="-1"></a>          )</span></code></pre></div>
 <p><img src="manitou_uas_202406_files/figure-html/unnamed-chunk-10-1.png" width="1008" /></p>
+<p>Here we will also plot with the DTM that we generated via the UAS point cloud <a href="https://github.com/georgewoolsey/point_cloud_tree_detection_ex/blob/da5c8a13e9b2f2914b306201605e907643b3006d/src/point_cloud_processing.R">processing script</a> using <code>lidR::add_dtm3d</code></p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="data_prep.html#cb11-1" tabindex="-1"></a>p_temp <span class="ot">=</span> lidR<span class="sc">::</span><span class="fu">plot</span>(las_temp</span>
+<span id="cb11-2"><a href="data_prep.html#cb11-2" tabindex="-1"></a>                    , <span class="at">color =</span> <span class="st">&quot;Z&quot;</span>, <span class="at">breaks =</span> <span class="st">&quot;quantile&quot;</span>, <span class="at">bg =</span> <span class="st">&quot;white&quot;</span>, <span class="at">legend =</span> T</span>
+<span id="cb11-3"><a href="data_prep.html#cb11-3" tabindex="-1"></a>                    , <span class="at">pal =</span> harrypotter<span class="sc">::</span><span class="fu">hp</span>(<span class="at">n=</span><span class="dv">50</span>, <span class="at">house =</span> <span class="st">&quot;gryffindor&quot;</span>)</span>
+<span id="cb11-4"><a href="data_prep.html#cb11-4" tabindex="-1"></a>                  )</span>
+<span id="cb11-5"><a href="data_prep.html#cb11-5" tabindex="-1"></a><span class="co"># add dtm to plot</span></span>
+<span id="cb11-6"><a href="data_prep.html#cb11-6" tabindex="-1"></a>lidR<span class="sc">::</span><span class="fu">add_dtm3d</span>(</span>
+<span id="cb11-7"><a href="data_prep.html#cb11-7" tabindex="-1"></a>  <span class="at">x =</span> p_temp</span>
+<span id="cb11-8"><a href="data_prep.html#cb11-8" tabindex="-1"></a>  , <span class="at">dtm =</span> dtm_rast <span class="sc">%&gt;%</span> </span>
+<span id="cb11-9"><a href="data_prep.html#cb11-9" tabindex="-1"></a>    terra<span class="sc">::</span><span class="fu">crop</span>(</span>
+<span id="cb11-10"><a href="data_prep.html#cb11-10" tabindex="-1"></a>      las_ctg_dta <span class="sc">%&gt;%</span> sf<span class="sc">::</span><span class="fu">st_centroid</span>() <span class="sc">%&gt;%</span> sf<span class="sc">::</span><span class="fu">st_buffer</span>(<span class="dv">80</span>) <span class="sc">%&gt;%</span> sf<span class="sc">::</span><span class="fu">st_bbox</span>() <span class="sc">%&gt;%</span> sf<span class="sc">::</span><span class="fu">st_as_sfc</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb11-11"><a href="data_prep.html#cb11-11" tabindex="-1"></a>        terra<span class="sc">::</span><span class="fu">vect</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb11-12"><a href="data_prep.html#cb11-12" tabindex="-1"></a>        terra<span class="sc">::</span><span class="fu">project</span>(terra<span class="sc">::</span><span class="fu">crs</span>(dtm_rast))</span>
+<span id="cb11-13"><a href="data_prep.html#cb11-13" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb11-14"><a href="data_prep.html#cb11-14" tabindex="-1"></a>    terra<span class="sc">::</span><span class="fu">mask</span>(</span>
+<span id="cb11-15"><a href="data_prep.html#cb11-15" tabindex="-1"></a>      las_ctg_dta <span class="sc">%&gt;%</span> sf<span class="sc">::</span><span class="fu">st_centroid</span>() <span class="sc">%&gt;%</span> sf<span class="sc">::</span><span class="fu">st_buffer</span>(<span class="dv">80</span>) <span class="sc">%&gt;%</span> sf<span class="sc">::</span><span class="fu">st_bbox</span>() <span class="sc">%&gt;%</span> sf<span class="sc">::</span><span class="fu">st_as_sfc</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb11-16"><a href="data_prep.html#cb11-16" tabindex="-1"></a>        terra<span class="sc">::</span><span class="fu">vect</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb11-17"><a href="data_prep.html#cb11-17" tabindex="-1"></a>        terra<span class="sc">::</span><span class="fu">project</span>(terra<span class="sc">::</span><span class="fu">crs</span>(dtm_rast))</span>
+<span id="cb11-18"><a href="data_prep.html#cb11-18" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb11-19"><a href="data_prep.html#cb11-19" tabindex="-1"></a>    terra<span class="sc">::</span><span class="fu">focal</span>(</span>
+<span id="cb11-20"><a href="data_prep.html#cb11-20" tabindex="-1"></a>      <span class="at">w =</span> <span class="dv">3</span></span>
+<span id="cb11-21"><a href="data_prep.html#cb11-21" tabindex="-1"></a>      , <span class="at">fun =</span> <span class="st">&quot;mean&quot;</span></span>
+<span id="cb11-22"><a href="data_prep.html#cb11-22" tabindex="-1"></a>      , <span class="at">na.rm =</span> T</span>
+<span id="cb11-23"><a href="data_prep.html#cb11-23" tabindex="-1"></a>      , <span class="at">na.policy =</span> <span class="st">&quot;only&quot;</span></span>
+<span id="cb11-24"><a href="data_prep.html#cb11-24" tabindex="-1"></a>    )</span>
+<span id="cb11-25"><a href="data_prep.html#cb11-25" tabindex="-1"></a>)</span></code></pre></div>
+<p><img src="manitou_uas_202406_files/figure-html/unnamed-chunk-11-1.png" width="1008" /></p>
+<p>Notice how the point altitudes are in meters above sea level. We can quickly normalize the point cloud using the DTM.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="data_prep.html#cb12-1" tabindex="-1"></a>nlas_temp <span class="ot">=</span> las_temp <span class="sc">-</span> dtm_rast</span>
+<span id="cb12-2"><a href="data_prep.html#cb12-2" tabindex="-1"></a><span class="co"># plot it</span></span>
+<span id="cb12-3"><a href="data_prep.html#cb12-3" tabindex="-1"></a>lidR<span class="sc">::</span><span class="fu">plot</span>(nlas_temp</span>
+<span id="cb12-4"><a href="data_prep.html#cb12-4" tabindex="-1"></a>           , <span class="at">color =</span> <span class="st">&quot;Z&quot;</span>, <span class="at">breaks =</span> <span class="st">&quot;quantile&quot;</span>, <span class="at">bg =</span> <span class="st">&quot;white&quot;</span>, <span class="at">legend =</span> T</span>
+<span id="cb12-5"><a href="data_prep.html#cb12-5" tabindex="-1"></a>           , <span class="at">pal =</span> harrypotter<span class="sc">::</span><span class="fu">hp</span>(<span class="at">n=</span><span class="dv">50</span>, <span class="at">house =</span> <span class="st">&quot;gryffindor&quot;</span>)</span>
+<span id="cb12-6"><a href="data_prep.html#cb12-6" tabindex="-1"></a>           )</span></code></pre></div>
+<p><img src="manitou_uas_202406_files/figure-html/unnamed-chunk-12-1.png" width="1008" /></p>
+<p>let’s get rid of all the ground points to focus on possible vegetation points</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="data_prep.html#cb13-1" tabindex="-1"></a>nlas_temp <span class="sc">%&gt;%</span> </span>
+<span id="cb13-2"><a href="data_prep.html#cb13-2" tabindex="-1"></a>  lidR<span class="sc">::</span><span class="fu">filter_poi</span>(Z<span class="sc">&gt;=</span><span class="fl">0.01</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-3"><a href="data_prep.html#cb13-3" tabindex="-1"></a>  lidR<span class="sc">::</span><span class="fu">plot</span>(<span class="at">color =</span> <span class="st">&quot;Z&quot;</span>, <span class="at">breaks =</span> <span class="st">&quot;quantile&quot;</span>, <span class="at">bg =</span> <span class="st">&quot;white&quot;</span>, <span class="at">legend =</span> T</span>
+<span id="cb13-4"><a href="data_prep.html#cb13-4" tabindex="-1"></a>             , <span class="at">pal =</span> harrypotter<span class="sc">::</span><span class="fu">hp</span>(<span class="at">n=</span><span class="dv">50</span>, <span class="at">house =</span> <span class="st">&quot;gryffindor&quot;</span>)</span>
+<span id="cb13-5"><a href="data_prep.html#cb13-5" tabindex="-1"></a>             )</span></code></pre></div>
+<p><img src="manitou_uas_202406_files/figure-html/unnamed-chunk-13-1.png" width="1008" /></p>
+<p>and let’s make a gif</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="data_prep.html#cb14-1" tabindex="-1"></a><span class="cf">if</span>(<span class="sc">!</span><span class="fu">file.exists</span>(<span class="st">&quot;../data/ptcld_z.gif&quot;</span>)){</span>
+<span id="cb14-2"><a href="data_prep.html#cb14-2" tabindex="-1"></a>  rgl<span class="sc">::</span><span class="fu">rgl.close</span>()</span>
+<span id="cb14-3"><a href="data_prep.html#cb14-3" tabindex="-1"></a>  nlas_temp <span class="sc">%&gt;%</span> </span>
+<span id="cb14-4"><a href="data_prep.html#cb14-4" tabindex="-1"></a>    lidR<span class="sc">::</span><span class="fu">filter_poi</span>(Z<span class="sc">&gt;=</span><span class="fl">0.01</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-5"><a href="data_prep.html#cb14-5" tabindex="-1"></a>    lidR<span class="sc">::</span><span class="fu">plot</span>(<span class="at">color =</span> <span class="st">&quot;Z&quot;</span>, <span class="at">breaks =</span> <span class="st">&quot;quantile&quot;</span>, <span class="at">bg =</span> <span class="st">&quot;white&quot;</span>, <span class="at">legend =</span> F</span>
+<span id="cb14-6"><a href="data_prep.html#cb14-6" tabindex="-1"></a>               , <span class="at">pal =</span> harrypotter<span class="sc">::</span><span class="fu">hp</span>(<span class="at">n=</span><span class="dv">50</span>, <span class="at">house =</span> <span class="st">&quot;gryffindor&quot;</span>)</span>
+<span id="cb14-7"><a href="data_prep.html#cb14-7" tabindex="-1"></a>               )</span>
+<span id="cb14-8"><a href="data_prep.html#cb14-8" tabindex="-1"></a>  rgl<span class="sc">::</span><span class="fu">movie3d</span>( rgl<span class="sc">::</span><span class="fu">spin3d</span>(), <span class="at">duration =</span> <span class="dv">8</span>, <span class="at">fps =</span> <span class="dv">10</span> , <span class="at">movie =</span> <span class="st">&quot;ptcld_z&quot;</span>, <span class="at">dir =</span> <span class="st">&quot;../data&quot;</span>)</span>
+<span id="cb14-9"><a href="data_prep.html#cb14-9" tabindex="-1"></a>  rgl<span class="sc">::</span><span class="fu">rgl.close</span>()</span>
+<span id="cb14-10"><a href="data_prep.html#cb14-10" tabindex="-1"></a>}</span></code></pre></div>
+<center>
+<img src="../data/ptcld_z.gif" />
+</center>
 
 </div>
 </div>

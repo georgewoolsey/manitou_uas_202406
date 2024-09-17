@@ -25,6 +25,7 @@ library(sf) # simple features
 library(stars) # stars raster
 # visualization
 library(kableExtra)
+library(rgl) # rgl
 library(patchwork) # ! better align plots in grid
 library(mapview) # interactive html maps
 library(leafpop) # interactive html maps
@@ -232,13 +233,21 @@ gc()
 ## What is this Point Cloud?
 
 ```{r,echo=FALSE,message=FALSE,warning=FALSE}
-# set up for printing rgl graphics
+## if want to get current rgl parameters
+# par3d()$zoom
+# par3d()$FOV
+# par3d()$userMatrix %>% c()
+# par3d()$windowRect
+## set up for printing rgl graphics
 r3dDefaults = rgl::r3dDefaults
-m = structure(c(0.921, -0.146, 0.362, 0, 0.386, 0.482, -0.787, 0, 
-                -0.06, 0.864, 0.5, 0, 0, 0, 0, 1), .Dim = c(4L, 4L))
-r3dDefaults$FOV = 50
+m = structure(c(
+  -0.98054653,0.09881500,-0.16960052,0.00000000,-0.18273330,-0.14403525,0.97255528,0.00000000,0.07167462
+  , 0.98462689,0.15928994,0.00000000,0.00000000,0.00000000,0.00000000,1.00000000
+), .Dim = c(4L, 4L))
+r3dDefaults$FOV = 30
 r3dDefaults$userMatrix = m
-r3dDefaults$zoom = 0.75
+r3dDefaults$zoom = 0.56
+r3dDefaults$windowRect = c(0,23,1536,864)
 rgl::setupKnitr(autoprint = TRUE)
 ```
 
@@ -259,12 +268,44 @@ what is this data?
 las_temp@data %>% dplyr::glimpse()
 ```
 
-The `lidR::plot` function allows for plotting powered by the [`rgl`](https://cran.r-project.org/package=rgl) package to provide a versatile and interactive 3D viewer of points. The argument `breaks` enables to defined more adequate breaks in the color palette for example when intensity contains large outliers.
+We can plot the point cloud with RGB if the spectral information was exported from the SfM software
+
+```{r, rgl = TRUE}
+lidR::plot(las_temp, color = "RGB", bg = "white", legend = F)
+```
+
+make a gif
+
+```{r}
+library(magick)
+if(!file.exists("../data/ptcld_rgb.gif")){
+  rgl::rgl.close()
+  lidR::plot(las_temp, color = "RGB", bg = "white", legend = F)
+  rgl::movie3d( rgl::spin3d(), duration = 8, fps = 10 , movie = "ptcld_rgb", dir = "../data")
+  rgl::rgl.close()
+}
+```
+
+<center>
+![](../data/ptcld_rgb.gif)
+</center>
+
+Things get fun when we view X and Y data in combination with Z data. The `lidR::plot` function allows for plotting powered by the [`rgl`](https://cran.r-project.org/package=rgl) package to provide a versatile and interactive 3D viewer of points. The argument `breaks` enables to defined more adequate breaks in the color palette for example when intensity contains large outliers.
+
+```{r, rgl = TRUE}
+lidR::plot(las_temp
+           , color = "Z", breaks = "quantile", bg = "white", legend = T
+           , pal = harrypotter::hp(n=50, house = "gryffindor")
+          )
+```
 
 Here we will also plot with the DTM that we generated via the UAS point cloud [processing script](https://github.com/georgewoolsey/point_cloud_tree_detection_ex/blob/da5c8a13e9b2f2914b306201605e907643b3006d/src/point_cloud_processing.R) using `lidR::add_dtm3d` 
 
 ```{r, rgl = TRUE}
-p_temp = lidR::plot(las_temp, color = "Z", breaks = "quantile", bg = "white", legend = T)
+p_temp = lidR::plot(las_temp
+                    , color = "Z", breaks = "quantile", bg = "white", legend = T
+                    , pal = harrypotter::hp(n=50, house = "gryffindor")
+                  )
 # add dtm to plot
 lidR::add_dtm3d(
   x = p_temp
@@ -293,7 +334,10 @@ Notice how the point altitudes are in meters above sea level. We can quickly nor
 ```{r, rgl = TRUE}
 nlas_temp = las_temp - dtm_rast
 # plot it
-lidR::plot(nlas_temp, color = "Z", breaks = "quantile", bg = "white", legend = T)
+lidR::plot(nlas_temp
+           , color = "Z", breaks = "quantile", bg = "white", legend = T
+           , pal = harrypotter::hp(n=50, house = "gryffindor")
+           )
 ```
 
 let's get rid of all the ground points to focus on possible vegetation points
@@ -301,8 +345,30 @@ let's get rid of all the ground points to focus on possible vegetation points
 ```{r, rgl = TRUE}
 nlas_temp %>% 
   lidR::filter_poi(Z>=0.01) %>% 
-  lidR::plot(color = "Z", breaks = "quantile", bg = "white", legend = T)
+  lidR::plot(color = "Z", breaks = "quantile", bg = "white", legend = T
+             , pal = harrypotter::hp(n=50, house = "gryffindor")
+             )
 ```
+
+and let's make a gif
+
+```{r}
+if(!file.exists("../data/ptcld_z.gif")){
+  rgl::rgl.close()
+  nlas_temp %>% 
+    lidR::filter_poi(Z>=0.01) %>% 
+    lidR::plot(color = "Z", breaks = "quantile", bg = "white", legend = F
+               , pal = harrypotter::hp(n=50, house = "gryffindor")
+               )
+  rgl::movie3d( rgl::spin3d(), duration = 8, fps = 10 , movie = "ptcld_z", dir = "../data")
+  rgl::rgl.close()
+}
+```
+
+<center>
+![](../data/ptcld_z.gif)
+</center>
+
 
 ```{r, warning=FALSE, message=FALSE, echo=FALSE, include=FALSE}
 remove(list = ls()[grep("_temp",ls())])

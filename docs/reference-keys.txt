@@ -1,9 +1,9 @@
-tab:unnamed-chunk-36
-tab:unnamed-chunk-38
-tab:unnamed-chunk-39
 tab:unnamed-chunk-43
-tab:unnamed-chunk-59
-tab:unnamed-chunk-60
+tab:unnamed-chunk-45
+tab:unnamed-chunk-46
+tab:unnamed-chunk-50
+tab:unnamed-chunk-66
+tab:unnamed-chunk-67
 introduction
 data_prep
 data-load

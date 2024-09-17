@@ -16,7 +16,7 @@ Let's go through the tree clump grouping process for a single stand
   # determine overstory by height
   ostory_ht_m = as.numeric(NA) # m = ft / 3.281
   # determine overstory by diameter
-  ostory_dbh_cm = 5*2.54 # cm = in * 2.54
+  ostory_dbh_cm = 7*2.54 # cm = in * 2.54
 #########################
 #########################
 # clump spacing
@@ -115,6 +115,47 @@ ortho_plt_fn(100) +
   )
 ```
 
+we obtained a DTM from the point cloud which was used to height-normalize the point cloud
+
+```{r, results='hide', fig.show='asis'}
+# dtm
+  dtm_temp = dtm_rast %>% 
+    terra::crop(
+      stand_sf %>% 
+      terra::vect()
+    ) %>% 
+    terra::mask(
+      stand_sf %>% 
+      terra::vect()
+    ) %>% 
+    terra::aggregate(fact = 2, fun = "mean", na.rm = T) %>% 
+    `*`(3.281) %>% # transform to feet
+    as.data.frame(xy=T) %>% 
+    rename(f=3)
+  
+  # plot it
+  plt_dtm_temp = ortho_plt_fn(100) +
+    # dtm
+    ggnewscale::new_scale_fill() +
+    geom_tile(
+      data = dtm_temp
+      , mapping = aes(x = x, y = y, fill = f)
+      , na.rm = T
+    ) +
+    harrypotter::scale_fill_hp("hufflepuff", alpha = 0.85, labels = scales::comma) +
+    labs(fill = "DTM (ft)") + 
+    theme(
+      legend.text = element_text(size = 5.5, angle = 40, hjust = 0.7)
+    )
+
+# PLOT IT
+plt_dtm_temp
+  
+# save it
+
+
+```
+
 plot with CHM
 
 ```{r, results='hide', fig.show='asis'}
@@ -129,7 +170,7 @@ plot with CHM
       terra::vect()
     ) %>% 
     terra::aggregate(fact = 2, fun = "mean", na.rm = T) %>% 
-    `*`(3.28) %>% # transform to feet
+    `*`(3.281) %>% # transform to feet
     as.data.frame(xy=T) %>% 
     rename(f=3)
   
@@ -142,7 +183,7 @@ plot with CHM
       , mapping = aes(x = x, y = y, fill = f)
       , na.rm = T
     ) +
-    harrypotter::scale_fill_hp("gryffindor") +
+    harrypotter::scale_fill_hp("gryffindor", alpha = 0.85) +
     labs(fill = "CHM (ft)")
 
 # PLOT IT
@@ -174,7 +215,7 @@ ortho_plt_fn(100) +
     , color = "gray55"
     , lwd = 0.5
   ) +
-  harrypotter::scale_fill_hp("gryffindor", alpha = 0.8, limits = c(4,85)) +
+  harrypotter::scale_fill_hp("gryffindor", alpha = 0.85, limits = c(4,85)) +
   labs(fill = "Individual Tree\nHt. (ft)")
 plt_crowns1
 ```
@@ -187,14 +228,13 @@ plt_ttops_temp = ortho_plt_fn(100) +
     geom_sf(
       data = treetops_sf_with_dbh %>% sf::st_intersection(stand_sf)
       , mapping = aes(color = tree_height_ft)
-      , size = 1.5
+      , size = 2.3
     ) +
     harrypotter::scale_color_hp("gryffindor") +
     labs(color = "Individual Tree\nHt. (ft)")
 
 # PLOT IT
 plt_ttops_temp
-  
 ```
 
 overstory/understory trees
@@ -218,7 +258,7 @@ plt_ttops_temp = ortho_plt_fn(100) +
           , ostory_sz = ifelse(ostory=="overstory",0.51,0.5)
         )
       , mapping = aes(color = ostory)
-      , size = 1.5
+      , size = 2.3
     ) +
     harrypotter::scale_color_hp_d("gryffindor", direction = -1) +
     labs(color = "") +
@@ -341,7 +381,7 @@ plt_grps_temp = ortho_plt_fn(100) +
     geom_sf(
       data = ttops_temp
       , mapping = aes(color = dbscan_cluster)
-      , size = 1.5
+      , size = 2.3
     ) +
     scale_color_manual(values = c(
       "white"
@@ -375,12 +415,37 @@ plt_grps_temp = ortho_plt_fn(100) +
     geom_sf(
       data = ttops_temp
       , mapping = aes(color = clump_n_trees_grp)
-      , size = 1.5
+      , size = 2.3
     ) +
     harrypotter::scale_color_hp_d("always", name = "clump size", drop = F) +
     labs(color = "") +
     theme(legend.key = element_rect(color = NA, fill = NA), legend.margin = margin(6.5,0,6.5,0)) +
     guides(size = "none", color = guide_legend(override.aes = list(size = 5)))
+
+# PLOT IT
+plt_grps_temp
+```
+
+if we want to plot the groups with the tree crowns we can do that too
+
+```{r, results='hide', fig.show='asis'}
+plt_grps_temp = ortho_plt_fn(100) +
+    # treetops
+    geom_sf(
+      data = crowns_sf_with_dbh %>% 
+        dplyr::inner_join(
+          ttops_temp %>% 
+            sf::st_drop_geometry() %>% 
+            dplyr::select(treeID, clump_n_trees_grp)
+          , by = "treeID"
+        )
+      , mapping = aes(fill = clump_n_trees_grp)
+      , size = 2.3
+    ) +
+    harrypotter::scale_fill_hp_d("always", name = "clump size", drop = F) +
+    labs(fill = "") +
+    theme(legend.key = element_rect(fill = NA, color = NA), legend.margin = margin(6.5,0,6.5,0)) +
+    guides(size = "none", fill = guide_legend(override.aes = list(size = 5)))
 
 # PLOT IT
 plt_grps_temp
@@ -420,7 +485,7 @@ ortho_plt_fn(100) +
     geom_sf(
       data = ttops_temp
       , mapping = aes(color = distance_clump_nn_m)
-      , size = 1.5
+      , size = 2.3
     ) +
     # scale_color_viridis_c(option="viridis", na.value = "white") + 
     harrypotter::scale_color_hp("hufflepuff", na.value = "white") + 
@@ -660,7 +725,7 @@ ortho_plt_fn(100) +
     data = clump_polys_temp
     , mapping = aes(fill = dbscan_cluster)
     , color = NA, alpha = 0.9
-    , size = 1.5
+    , size = 2.3
   ) +
   scale_fill_manual(values = c(
     "white"
@@ -690,10 +755,26 @@ ortho_plt_fn(100) +
     geom_sf(
       data = clump_polys_temp
       , mapping = aes(fill = distance_nearest_clump_m)
-      , size = 1.5, color = NA
+      , size = 2.3, color = NA
     ) +
     harrypotter::scale_fill_hp("mischief", direction = -1) + 
     labs(fill = "nearest clump\ndist. (m)")
+```
+
+and plot the clump group size
+
+```{r, results='hide', fig.show='asis'}
+ortho_plt_fn(100) +
+    ggnewscale::new_scale_fill() +
+    geom_sf(
+      data = clump_polys_temp
+      , mapping = aes(fill = clump_n_trees_grp)
+      , size = 2.3, color = NA
+    ) +
+    harrypotter::scale_fill_hp_d("always", name = "clump size", drop = F) +
+    labs(fill = "") +
+    theme(legend.key = element_rect(fill = NA, color = NA), legend.margin = margin(6.5,0,6.5,0)) +
+    guides(size = "none", fill = guide_legend(override.aes = list(size = 5)))
 ```
 
 ### Clump Spacing

@@ -287,7 +287,7 @@ if(!file.exists("../data/ptcld_rgb.gif")){
 ```
 
 <center>
-![](../data/ptcld_rgb.gif)
+![](https://s11.gifyu.com/images/SAzC7.gif)
 </center>
 
 Things get fun when we view X and Y data in combination with Z data. The `lidR::plot` function allows for plotting powered by the [`rgl`](https://cran.r-project.org/package=rgl) package to provide a versatile and interactive 3D viewer of points. The argument `breaks` enables to defined more adequate breaks in the color palette for example when intensity contains large outliers.
@@ -366,7 +366,7 @@ if(!file.exists("../data/ptcld_z.gif")){
 ```
 
 <center>
-![](../data/ptcld_z.gif)
+![](https://s11.gifyu.com/images/SAzCy.gif)
 </center>
 
 
